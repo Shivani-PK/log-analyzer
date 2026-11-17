@@ -1,0 +1,5 @@
+2026-01-15T09:50:00Z INFO Starting synthetic record import
+2026-01-15T09:50:01Z INFO Beginning database transaction
+2026-01-15T09:50:02Z ERROR SQLSTATE 23505: duplicate key violates unique constraint demo_record_key
+2026-01-15T09:50:03Z INFO Rolling back transaction
+2026-01-15T09:50:04Z ERROR Job failed: record import aborted

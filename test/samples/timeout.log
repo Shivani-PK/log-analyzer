@@ -1,0 +1,6 @@
+2026-01-15T09:20:00Z INFO Starting batch request
+2026-01-15T09:20:01Z INFO Waiting for worker response
+2026-01-15T09:20:31Z ERROR TimeoutException: request timed out after 30000 ms
+2026-01-15T09:20:32Z WARN Retrying request; attempt 2 of 2
+2026-01-15T09:21:02Z ERROR Request timeout after retry
+2026-01-15T09:21:03Z FATAL Job failed: retry limit reached

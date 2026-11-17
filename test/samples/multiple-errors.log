@@ -1,0 +1,8 @@
+2026-01-15T10:10:00Z INFO Starting synthetic pipeline
+2026-01-15T10:10:01Z WARN Worker queue depth is elevated
+2026-01-15T10:10:02Z ERROR Request timeout while checking worker availability
+2026-01-15T10:10:03Z ERROR Stage failed: initialization incomplete
+2026-01-15T10:10:04Z ERROR Connection refused by database listener
+2026-01-15T10:10:05Z WARNING Skipping dependent pipeline tasks
+2026-01-15T10:10:06Z FATAL Job failed: pipeline aborted
+2026-01-15T10:10:07Z INFO Pipeline resources released

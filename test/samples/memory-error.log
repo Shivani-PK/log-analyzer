@@ -1,0 +1,5 @@
+2026-01-15T09:30:00Z INFO Starting synthetic batch transformation
+2026-01-15T09:30:01Z INFO Loading records into processing buffer
+2026-01-15T09:30:02Z FATAL java.lang.OutOfMemoryError: Java heap space
+2026-01-15T09:30:03Z ERROR Transformation task failed
+2026-01-15T09:30:04Z INFO Closing input stream

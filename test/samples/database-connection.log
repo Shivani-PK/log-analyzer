@@ -1,0 +1,6 @@
+2026-01-15T09:00:00Z INFO Import job started
+2026-01-15T09:00:01Z INFO Opening database connection pool
+2026-01-15T09:00:02Z ERROR SQLTransientConnectionException: connection refused by database listener
+2026-01-15T09:00:03Z WARN No available database connections; stopping import
+2026-01-15T09:00:04Z INFO Releasing job resources
+2026-01-15T09:00:05Z FATAL Job failed: database initialization incomplete
