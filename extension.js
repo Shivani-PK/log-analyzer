@@ -1,11 +1,16 @@
 const vscode = require('vscode');
 const path = require('node:path');
+const { sanitizeLog } = require('./src/sanitizer/logSanitizer');
 const { analyzeLog } = require('./src/analyzer/logAnalyzer');
 const { detectRootCause, buildAnalysisResult } = require('./src/analyzer/rootCauseRules');
 
 function activate(context) {
   const outputChannel = vscode.window.createOutputChannel('Log Analyzer');
   context.subscriptions.push(outputChannel);
+
+  function appendOutputLine(text) {
+    outputChannel.appendLine(sanitizeLog(text));
+  }
 
   async function analyzeActiveEditor(selectionOnly) {
     const editor = vscode.window.activeTextEditor;
@@ -37,48 +42,48 @@ function activate(context) {
     const analysis = buildAnalysisResult(matches, rootCause);
 
     outputChannel.clear();
-    outputChannel.appendLine(`SOURCE: ${selectionOnly ? 'Selection' : 'Current File'}`);
-    outputChannel.appendLine('');
-    outputChannel.appendLine(`STATUS: ${analysis.status.toUpperCase()}`);
-    outputChannel.appendLine('');
-    outputChannel.appendLine('ROOT CAUSE:');
-    outputChannel.appendLine(analysis.rootCause);
-    outputChannel.appendLine('');
-    outputChannel.appendLine('CATEGORY:');
-    outputChannel.appendLine(analysis.category);
-    outputChannel.appendLine('');
-    outputChannel.appendLine('EVIDENCE:');
-    outputChannel.appendLine(analysis.lineNumber === null
+    appendOutputLine(`SOURCE: ${selectionOnly ? 'Selection' : 'Current File'}`);
+    appendOutputLine('');
+    appendOutputLine(`STATUS: ${analysis.status.toUpperCase()}`);
+    appendOutputLine('');
+    appendOutputLine('ROOT CAUSE:');
+    appendOutputLine(analysis.rootCause);
+    appendOutputLine('');
+    appendOutputLine('CATEGORY:');
+    appendOutputLine(analysis.category);
+    appendOutputLine('');
+    appendOutputLine('EVIDENCE:');
+    appendOutputLine(analysis.lineNumber === null
       ? 'None.' : `Line ${analysis.lineNumber}: ${analysis.evidence}`);
-    outputChannel.appendLine('');
-    outputChannel.appendLine('SUGGESTED CHECKS:');
+    appendOutputLine('');
+    appendOutputLine('SUGGESTED CHECKS:');
     if (analysis.suggestedChecks.length === 0) {
-      outputChannel.appendLine('None.');
+      appendOutputLine('None.');
     }
     for (const check of analysis.suggestedChecks) {
-      outputChannel.appendLine(`- ${check}`);
+      appendOutputLine(`- ${check}`);
     }
-    outputChannel.appendLine('');
-    outputChannel.appendLine('CONFIDENCE:');
-    outputChannel.appendLine(analysis.confidence.toFixed(2));
-    outputChannel.appendLine('');
+    appendOutputLine('');
+    appendOutputLine('CONFIDENCE:');
+    appendOutputLine(analysis.confidence.toFixed(2));
+    appendOutputLine('');
     if (matches.length === 0) {
-      outputChannel.appendLine('No obvious errors found.');
+      appendOutputLine('No obvious errors found.');
     } else {
       for (const match of matches) {
-        outputChannel.appendLine('Match:');
-        outputChannel.appendLine(`Line ${match.lineNumber} [${match.severity}] [${match.pattern}]: ${match.text}`);
-        outputChannel.appendLine('');
-        outputChannel.appendLine('Context before:');
+        appendOutputLine('Match:');
+        appendOutputLine(`Line ${match.lineNumber} [${match.severity}] [${match.pattern}]: ${match.text}`);
+        appendOutputLine('');
+        appendOutputLine('Context before:');
         match.contextBefore.forEach((contextLine, contextIndex) => {
-          outputChannel.appendLine(`Line ${match.lineNumber - match.contextBefore.length + contextIndex}: ${contextLine}`);
+          appendOutputLine(`Line ${match.lineNumber - match.contextBefore.length + contextIndex}: ${contextLine}`);
         });
-        outputChannel.appendLine('');
-        outputChannel.appendLine('Context after:');
+        appendOutputLine('');
+        appendOutputLine('Context after:');
         match.contextAfter.forEach((contextLine, contextIndex) => {
-          outputChannel.appendLine(`Line ${match.lineNumber + 1 + contextIndex}: ${contextLine}`);
+          appendOutputLine(`Line ${match.lineNumber + 1 + contextIndex}: ${contextLine}`);
         });
-        outputChannel.appendLine('');
+        appendOutputLine('');
       }
     }
     outputChannel.show(true);

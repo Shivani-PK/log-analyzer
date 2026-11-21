@@ -210,3 +210,42 @@ for (const id of ['log-analyzer.analyzeLog', 'log-analyzer.analyzeSelection']) {
     assert.ok(host.output.includes('Database connection failure'));
   });
 }
+
+
+for (const id of ['log-analyzer.analyzeLog', 'log-analyzer.analyzeSelection']) {
+  test(`${id} redacts evidence and context without changing raw-text ranking`, async () => {
+    const selection = { isEmpty: false };
+    const text = [
+      'INFO Authorization: Bearer demoBearer123',
+      'ERROR authentication failed password="demoPassword123"',
+      'INFO api_key=demoApiKey123',
+      'INFO token=eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiMTIzIn0.signature',
+      'INFO Authorization: Basic demoBasic123'
+    ].join('\n');
+    const host = createHost({ selection, document: { getText() { return text; } } });
+    await host.commands.get(id)();
+    const displayed = host.output.join('\n');
+    for (const secret of ['demoBearer123', 'demoPassword123', 'demoApiKey123', 'demoBasic123', 'eyJhbGciOiJIUzI1NiJ9']) {
+      assert.equal(displayed.includes(secret), false);
+    }
+    assert.ok(displayed.includes('Authentication failure'));
+    assert.ok(displayed.includes('0.95'));
+    assert.ok(displayed.includes('Line 2: ERROR authentication failed password="[REDACTED]"'));
+    assert.ok(displayed.includes('Line 2 [error] [ERROR]: ERROR authentication failed password="[REDACTED]"'));
+    assert.ok(displayed.includes('Line 1: INFO Authorization: Bearer [REDACTED]'));
+    assert.ok(displayed.includes('Line 3: INFO api_key=[REDACTED]'));
+    assert.ok(displayed.includes('Line 4: INFO token=[REDACTED]'));
+    assert.ok(displayed.includes('Line 5: INFO Authorization: Basic [REDACTED]'));
+  });
+}
+
+test('redacts a sensitive value that contains a root-cause keyword after analyzing original text', async () => {
+  const host = createHost({ selection: { isEmpty: true }, document: {
+    getText() { return 'ERROR password="connection refused"'; }
+  } });
+  await host.commands.get('log-analyzer.analyzeLog')();
+  assert.ok(host.output.includes('Database connection failure'));
+  assert.ok(host.output.includes('0.95'));
+  assert.ok(host.output.includes('Line 1: ERROR password="[REDACTED]"'));
+  assert.equal(host.output.some(line => line.includes('connection refused')), false);
+});
